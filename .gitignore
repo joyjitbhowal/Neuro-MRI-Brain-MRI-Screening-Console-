@@ -1,8 +1,9 @@
 # Ignore everything in the workspace root by default
 /*
-# ...except the web application and the Colab training script
+# ...except the web application, the Colab training script, and the README
 !/brain_tumor_webapp/
 !/brain_tumor_colab_loop.py
+!/README.md
 
 # --- inside brain_tumor_webapp ---
 # runtime artifacts (never commit user uploads or generated previews)
