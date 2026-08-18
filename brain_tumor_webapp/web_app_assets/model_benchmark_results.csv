@@ -1,0 +1,8 @@
+Architecture,Test_Accuracy,Test_F1,Epochs_Run,Train_Time_sec
+DenseNet121_finetuned,0.9415,0.9413,15,976.0
+ResNet50_finetuned,0.9168,0.9176,10,594.8
+CNN_scratch,0.892,0.8924,14,168.6
+ResNet50_frozen,0.8898,0.8902,15,327.1
+DenseNet121_frozen,0.8504,0.8483,15,362.8
+Hybrid_CNN_ViT_scratch,0.8054,0.8067,15,609.5
+ViT_scratch,0.7289,0.7271,15,202.1

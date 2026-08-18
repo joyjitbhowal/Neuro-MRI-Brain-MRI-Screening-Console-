@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="BDNeuro-MRI — AI-assisted brain MRI classification. Seven deep-learning models classify scans into glioma, meningioma, pituitary tumor, or no tumor.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#070B13">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e9eef6">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="BDNeuro-MRI">
+  <meta property="og:title" content="BDNeuro-MRI — AI Brain MRI Screening Console">
+  <meta property="og:description" content="Upload a brain MRI scan and get an instant consensus verdict from seven deep-learning models — glioma, meningioma, pituitary tumor, or no tumor.">
+  <meta property="og:image" content="{{ url_for('static', filename='img/samples/sample_glioma.jpg') }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BDNeuro-MRI — AI Brain MRI Screening Console">
+  <meta name="twitter:description" content="Seven deep-learning models, one consensus verdict for your brain MRI scan.">
+
+  <title>BDNeuro-MRI — Brain MRI Classification Console</title>
+
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+
+  <script>
+    (function () {
+      var t = localStorage.getItem("bdneuro-theme");
+      if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Neuro-MRI",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any",
+    "description": "AI-assisted brain MRI screening console powered by an ensemble of seven deep-learning models.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+  }
+  </script>
+</head>
+<body>
+
+  <a class="skip-link" href="#classification">Skip to analysis</a>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
+  <noscript>
+    <div class="flash" role="alert" style="margin:16px auto; max-width:1120px; width:calc(100% - 40px);">
+      JavaScript is required for the analysis console. Please enable it to upload scans.
+    </div>
+  </noscript>
+
+  <!-- ambient aurora background -->
+  <div class="aurora" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- ============================================================ NAV -->
+  <nav class="app-nav" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a class="nav-brand" href="#home" aria-label="Neuro-MRI — back to top">
+        <span class="logo-dot" aria-hidden="true"></span>
+        Neuro-MRI
+        <span class="brand-sub">scan console</span>
+      </a>
+
+      <div class="nav-panel" id="nav-panel">
+        <ul class="nav-links">
+          <li><a href="#home" class="active" aria-current="page">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#benchmark">Benchmark</a></li>
+          <li><a href="#analysis">Analysis</a></li>
+          <li><a href="#classification">Classification</a></li>
+        </ul>
+        <a class="btn btn-primary nav-cta" href="#classification"><span class="shine"></span>Run a scan</a>
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-hamburger" id="nav-toggle" aria-expanded="false" aria-controls="nav-panel" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light or dark theme" title="Toggle theme">
+          <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.2"></circle>
+            <path d="M12 2v2.5M12 19.5V22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M2 12h2.5M19.5 12H22M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
+          </svg>
+          <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ========================================================== HERO -->
+    <section id="home" class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <span class="hero-status"><span class="pulse"></span> Seven models · one verdict · T1-weighted CE MRI</span>
+          <h1>Brain tumor Classification and Detection,<br>with <span class="accent">multi-model comparison</span> at once.</h1>
+          <p>
+            Upload a brain MRI scan and our ensemble — CNN, ViT, Hybrid CNN–ViT,
+            ResNet50 and DenseNet121 — classifies it into <strong>glioma</strong>,
+            <strong>meningioma</strong>, <strong>pituitary tumor</strong> or
+            <strong>no tumor</strong>, with a consensus verdict and per-model breakdown.
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#classification"><span class="shine"></span>Run a scan</a>
+            <a class="btn" href="#benchmark"><span class="shine"></span>See benchmark results</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== ABOUT -->
+    <section id="about">
+      <div class="container">
+        <header class="sec-head">
+          <p class="sec-eyebrow">About</p>
+          <h2>What this tool does</h2>
+          <p class="sec-sub">A computer-vision ensemble that gives a second, data-driven look at a brain MRI — in plain terms.</p>
+        </header>
+
+        <div class="about-grid reveal">
+          <div class="about-card panel">
+            <div class="card-k">01 · The task</div>
+            <h3>Four-class MRI classification</h3>
+            <p>
+              Each scan is classified into one of four outcomes: glioma,
+              meningioma, pituitary tumor, or no tumor. Every model votes
+              independently; the page combines their votes into a single
+              consensus verdict, plus a probability-averaged ensemble result.
+            </p>
+          </div>
+
+          <div class="about-card panel">
+            <div class="card-k">02 · The training data</div>
+            <h3>Trained on 5,941 clinical scans</h3>
+            <p>
+              T1-weighted contrast-enhanced MRI images sourced from Epic &amp;
+              CSCR Hospital, Bangladesh, split 70 / 15 / 15 into
+              train / validation / test — with an automated check confirming
+              <strong>zero overlap</strong> between the splits, so the numbers on
+              this page reflect genuine generalization, not memorized duplicates.
+            </p>
+            <div class="chip-row">
+              <span class="chip cyan">5,941 images</span>
+              <span class="chip">4 classes</span>
+              <span class="chip">T1W-CE</span>
+              <span class="chip">zero-overlap split</span>
+            </div>
+          </div>
+
+          <div class="about-card panel">
+            <div class="card-k">03 · The models</div>
+            <h3>Three training paradigms</h3>
+            <p>
+              The seven models compare three approaches: architectures trained
+              from scratch on this dataset, pretrained ImageNet backbones used
+              with frozen weights, and pretrained backbones fine-tuned on MRI.
+              The benchmark section shows exactly how that choice plays out.
+            </p>
+            <div class="chip-row">
+              <span class="chip">from scratch</span>
+              <span class="chip">frozen pretrained</span>
+              <span class="chip cyan">fine-tuned</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="limitation">
+          <span class="lim-ic">&#9888;</span>
+          <p>
+            <strong>Research / coursework tool — not a diagnostic device.</strong>
+            Neuro-MRI is built for an academic project and educational use. It is
+            not approved for clinical use and does not replace a radiologist or a
+            medical diagnosis. Always consult a qualified doctor about your scan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================== BENCHMARK -->
+    <section id="benchmark">
+      <div class="container">
+        <header class="sec-head">
+          <p class="sec-eyebrow">Benchmark</p>
+          <h2>Model comparison</h2>
+          <p class="sec-sub">
+            Seven architectures on the held-out test set (889 scans never seen
+            during training), sorted by test accuracy. The tag per row shows the
+            training paradigm — the variable this comparison actually measures.
+          </p>
+        </header>
+
+        <div class="bench-grid reveal">
+          <div class="panel">
+            <div class="table-wrap">
+              <table class="bench">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Architecture</th>
+                    <th>Paradigm</th>
+                    <th>Accuracy</th>
+                    <th>F1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for r in benchmark %}
+                  <tr class="{{ 'rank-1' if loop.first }}">
+                    <td class="mono num">{{ loop.index }}</td>
+                    <td class="mono">{{ r.arch }}</td>
+                    <td>
+                      <span class="paradigm {{ 'fine-tuned' if r.paradigm == 'Fine-tuned' else ('frozen' if r.paradigm == 'Frozen pretrained' else 'from-scratch') }}">
+                        {{ r.paradigm }}
+                      </span>
+                    </td>
+                    <td class="num">{{ '%.2f' | format(r.accuracy) }}%</td>
+                    <td class="num">{{ '%.2f' | format(r.f1) }}%</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="field-label">Test accuracy by model</div>
+            <div class="bars">
+              {% set max_acc = benchmark[0].accuracy if benchmark else 100 %}
+              {% for r in benchmark %}
+              <div class="bar-row">
+                <span class="bar-name" title="{{ r.arch }}">{{ r.arch }}</span>
+                <span class="bar-track">
+                  <span class="bar-fill" style="--w: {{ (r.accuracy / max_acc * 100) | round(1) }}%"></span>
+                </span>
+                <span class="bar-pct">{{ '%.1f' | format(r.accuracy) }}%</span>
+              </div>
+              {% endfor %}
+            </div>
+            <p class="sec-sub" style="margin-top:14px; font-size:13px;">
+              Bars are scaled to the top model ({{ '%.1f' | format(max_acc) }}%). Fills animate on scroll into view.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================= ANALYSIS -->
+    <section id="analysis">
+      <div class="container">
+        <header class="sec-head">
+          <p class="sec-eyebrow">Analysis</p>
+          <h2>Reading the results</h2>
+          <p class="sec-sub">The class distribution behind the split, and what the accuracy numbers actually say.</p>
+        </header>
+
+        <div class="analysis-grid reveal">
+          <div class="panel">
+            <div class="field-label">Class distribution · train / val / test</div>
+            <div class="table-wrap">
+              <table class="split">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Train</th>
+                    <th>Val</th>
+                    <th>Test</th>
+                    <th>Total</th>
+                    <th>Share</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for name, tr, va, te, tot, pct in distribution %}
+                  <tr>
+                    <td>{{ name }}</td>
+                    <td><span class="num">{{ '{:,}'.format(tr) }}</span></td>
+                    <td><span class="num">{{ '{:,}'.format(va) }}</span></td>
+                    <td><span class="num">{{ '{:,}'.format(te) }}</span></td>
+                    <td><span class="num">{{ '{:,}'.format(tot) }}</span></td>
+                    <td class="pct mono">{{ '%.1f' | format(pct) }}%</td>
+                  </tr>
+                  {% endfor %}
+                  <tr class="total">
+                    <td>Total</td>
+                    <td><span class="num">4,160</span></td>
+                    <td><span class="num">892</span></td>
+                    <td><span class="num">889</span></td>
+                    <td><span class="num">5,941</span></td>
+                    <td class="pct mono">100%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="sec-sub" style="margin-top:12px; font-size:13px;">
+              Stratified split preserves each class share in train / val / test.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="field-label">What the numbers say</div>
+            <div class="notes">
+              {% for note in analysis_notes %}
+              <div class="note">
+                <span class="note-ic">&#9656;</span>
+                <p>{{ note }}</p>
+              </div>
+              {% endfor %}
+              <div class="note">
+                <span class="note-ic">&#9656;</span>
+                <p>
+                  Data source: class totals from the Neuro-MRI dataset
+                  description (<span class="mono">glioma 36.9% · meningioma 24.9% ·
+                  pituitary 25.0% · no tumor 13.2%</span>); all accuracy and F1
+                  figures are the raw values in
+                  <span class="mono">model_benchmark_results.csv</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================== CLASSIFICATION -->
+    <section id="classification">
+      <div class="container">
+        <header class="sec-head">
+          <p class="sec-eyebrow">Classification</p>
+          <h2>Run an analysis</h2>
+          <p class="sec-sub">Upload a brain MRI — or try one of the built-in samples — and get the verdict of all {{ payload.n_models if payload else '7' }} models.</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for cat, msg in messages %}
+            <div class="flash" role="alert">{{ msg }}</div>
+          {% endfor %}
+        {% endwith %}
+
+        <div class="class-grid reveal">
+          <div class="panel">
+            <form id="upload-form" method="post" enctype="multipart/form-data" action="{{ url_for('home') }}#classification">
+              <label class="dropzone" for="image" id="dropzone">
+                <span class="dz-ic">&#8682;</span>
+                <span class="dz-main">Click to select, or drop an MRI image</span>
+                <span class="dz-sub">JPG · PNG · BMP · TIFF &nbsp;·&nbsp; up to 16 MB</span>
+                <span class="dz-file">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <path d="M14 2v6h6M9 15h6M9 11h2"></path>
+                  </svg>
+                  <span class="dz-fname" id="dz-file-name"></span>
+                  <span class="dz-fsize" id="dz-file-size"></span>
+                </span>
+                <input type="file" name="image" id="image" accept="image/png,image/jpeg,image/bmp,image/tiff" required>
+              </label>
+              <button type="submit" class="btn btn-primary" id="analyze-btn" style="width:100%; margin-top:14px; justify-content:center;">
+                <span class="btn-label">Analyze with all {{ payload.n_models if payload else '7' }} models</span>
+              </button>
+            </form>
+
+            <span class="field-label">or try a demo scan</span>
+            <div class="sample-grid">
+              {% for s in samples %}
+              <a href="{{ url_for('home', sample=s) }}#classification" class="sample-card" title="Run this sample">
+                <img src="{{ url_for('static', filename='img/samples/' ~ s) }}" alt="Example MRI scan: {{ s.replace('sample_', '').replace('.jpg', '').replace('.png', '') }}" loading="lazy">
+                <span class="sample-tag">{{ s.replace('sample_', '').replace('.jpg', '').replace('.png', '') }}</span>
+              </a>
+              {% endfor %}
+            </div>
+
+            <p class="sec-sub" style="margin-top:16px; font-size:12.5px;">
+              &#9670; Images are processed in memory for this analysis only and are
+              not stored after the result is produced.
+            </p>
+          </div>
+
+          <div class="panel" id="result-panel">
+            {% if payload %}
+              {% set is_tumor = payload.w_label != 'no_tumor' %}
+              <div class="verdict {{ 'verdict-tumor' if is_tumor else 'verdict-clean' }}">
+                <span class="v-ic">{{ '&#9888;' if is_tumor else '&#10003;' }}</span>
+                <div>
+                  <h4>{{ 'Possible tumor detected' if is_tumor else 'No tumor detected' }}</h4>
+                  <p>
+                    {% if is_tumor %}
+                      Accuracy-weighted verdict: <strong class="mono">{{ payload.w_label }}</strong>
+                      (score {{ '{:.0%}'.format(payload.w_conf) }} of confidence mass).
+                      Screening signal — confirm with a specialist.
+                    {% else %}
+                      The weighted ensemble found no clear tumor signs in this scan.
+                    {% endif %}
+                  </p>
+                  <div class="v-chip-row">
+                    <span class="v-chip">Weighted score · <span class="num">{{ payload.w_label }}</span> · {{ '{:.0%}'.format(payload.w_conf) }}</span>
+                    <span class="v-chip">Consensus · <span class="num">{{ payload.con_label }}</span> · {{ '{:.0%}'.format(payload.con_conf) }}</span>
+                    <span class="v-chip">Ensemble · <span class="num">{{ payload.ens_label }}</span> · {{ '{:.0%}'.format(payload.ens_conf) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              {% if payload.img_url %}
+              <div style="text-align:center; margin-bottom:16px;">
+                <img src="{{ payload.img_url }}" alt="analyzed scan"
+                     style="max-width:220px; width:100%; border-radius:8px; border:1px solid var(--glass-bd);">
+              </div>
+              {% endif %}
+
+              <div class="field-label">Class scores · accuracy-weighted</div>
+              {% for c in classes %}
+              <div class="prob-row">
+                <span class="prob-name">{{ c }}</span>
+                <span class="prob-bar"><span class="prob-fill" style="width:{{ payload.w_scores[c] * 100 }}%;"></span></span>
+                <span class="prob-pct">{{ '{:.0%}'.format(payload.w_scores[c]) }}</span>
+              </div>
+              {% endfor %}
+              <p class="sec-sub" style="margin-top:12px; font-size:12px;">
+                Score = 70% weighted probability + 30% weighted vote, where each
+                model's weight is its test accuracy raised to the 4th power —
+                so top models dominate the verdict.
+              </p>
+
+              <details class="model-detail">
+                <summary>Per-model breakdown · {{ payload.n_models }} predictions</summary>
+                <div class="table-wrap" style="border-top:1px solid var(--glass-bd);">
+                  <table class="bench">
+                    <thead>
+                      <tr>
+                        <th>Model</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                        <th>Weight</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for r in payload.results %}
+                      <tr>
+                        <td class="mono">{{ r.name }}</td>
+                        <td>{{ r.label }}</td>
+                        <td class="num">{{ '{:.1%}'.format(r.confidence) }}</td>
+                        <td class="num">{{ '{:.1%}'.format(payload.w_weights[r.name]) }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            {% else %}
+              <div style="text-align:center; padding:64px 20px;">
+                <div style="font-family:var(--font-mono); color:var(--cyan); font-size:26px; margin-bottom:10px;">&#9678;</div>
+                <h4 style="font-size:16px; margin:0 0 6px;">Awaiting input</h4>
+                <p style="color:var(--text-muted); font-size:13.5px; margin:0;">
+                  Run the scan and the verdict, class probabilities and the
+                  per-model breakdown will appear here.
+                </p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================== CUSTOM LOADER -->
+  <div class="loader-overlay" id="loader" hidden role="status" aria-live="polite">
+    <div class="loader-card glass">
+      <div class="loader-ring">
+        <span class="inner">&#9678;</span>
+      </div>
+      <div class="loader-title">Analyzing scan</div>
+      <div class="loader-step" id="loader-step">Loading models&#8230;</div>
+      <div class="loader-bar"><i id="loader-fill"></i></div>
+      <div class="loader-hint">seven models · weighted scoring · ~1&#8211;5 s</div>
+    </div>
+  </div>
+
+  <!-- ======================================================= BACK TO TOP -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7"></path>
+    </svg>
+  </button>
+
+  <!-- ======================================================== TOASTS -->
+  <div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- =========================================================== FOOTER -->
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand-block">
+          <div class="footer-brand">
+            <span class="logo-dot" aria-hidden="true"></span>
+            Neuro-MRI
+            <span class="footer-sub">scan console</span>
+          </div>
+          <p>AI-assisted brain MRI screening — seven deep-learning models, one consensus verdict.</p>
+        </div>
+        <div class="footer-links">
+          <span class="footer-label">Navigate</span>
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#benchmark">Benchmark</a>
+          <a href="#analysis">Analysis</a>
+          <a href="#classification">Run a scan</a>
+        </div>
+      </div>
+      <div class="footer-meta">
+        Neuro-MRI · research / coursework tool · not a diagnostic device.
+        Always consult a qualified doctor about your scan.
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

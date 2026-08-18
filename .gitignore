@@ -1,0 +1,25 @@
+# Ignore everything in the workspace root by default
+/*
+# ...except the web application and the Colab training script
+!/brain_tumor_webapp/
+!/brain_tumor_colab_loop.py
+
+# --- inside brain_tumor_webapp ---
+# runtime artifacts (never commit user uploads or generated previews)
+brain_tumor_webapp/uploads/
+brain_tumor_webapp/static/generated/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

@@ -1,0 +1,18 @@
+{
+  "name": "BDNeuro-MRI — AI Brain MRI Screening Console",
+  "short_name": "BDNeuro-MRI",
+  "description": "AI-assisted brain MRI screening. Seven deep-learning models classify scans into glioma, meningioma, pituitary tumor, or no tumor.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070B13",
+  "theme_color": "#070B13",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "dataset": "BDNeuro-MRI (Mendeley DOI 10.17632/zwr4ntf94j.7)",
+  "img_size": [
+    224,
+    224
+  ],
+  "class_names": [
+    "glioma",
+    "meningioma",
+    "no_tumor",
+    "pituitary"
+  ],
+  "test_samples": 889,
+  "models_dir": "models/",
+  "models": {
+    "CNN_scratch": {
+      "file": "models/CNN_scratch.keras",
+      "preprocessing": "rescale_255"
+    },
+    "ViT_scratch": {
+      "file": "models/ViT_scratch.keras",
+      "preprocessing": "rescale_255"
+    },
+    "Hybrid_CNN_ViT_scratch": {
+      "file": "models/Hybrid_CNN_ViT_scratch.keras",
+      "preprocessing": "rescale_255"
+    },
+    "ResNet50_frozen": {
+      "file": "models/ResNet50_frozen.keras",
+      "preprocessing": "resnet50"
+    },
+    "DenseNet121_frozen": {
+      "file": "models/DenseNet121_frozen.keras",
+      "preprocessing": "densenet121"
+    },
+    "ResNet50_finetuned": {
+      "file": "models/ResNet50_finetuned.keras",
+      "preprocessing": "resnet50"
+    },
+    "DenseNet121_finetuned": {
+      "file": "models/DenseNet121_finetuned.keras",
+      "preprocessing": "densenet121"
+    }
+  },
+  "metrics_csv": "web_app_assets/per_model_metrics.csv",
+  "charts": [
+    "overall_accuracy_f1.png",
+    "macro_metrics.png",
+    "per_class_recall.png",
+    "per_class_precision.png",
+    "recall_heatmap.png",
+    "precision_heatmap.png",
+    "comparison_dashboard.png",
+    "speed_accuracy_tradeoff.png"
+  ],
+  "confusion_dir": "web_app_assets/confusion/"
+}
